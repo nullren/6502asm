@@ -358,7 +358,7 @@ document.getElementById( "compileButton" ).disabled = false;
 document.getElementById( "runButton" ).disabled = true;
 document.getElementById( "hexdumpButton" ).disabled = true;
 document.getElementById( "fileSelect" ).disabled = false;
-document.getElementById( "submitCode" ).disabled = true;
+//document.getElementById( "submitCode" ).disabled = true;
 //document.getElementById( "watch" ).disabled = true;
 document.getElementById( "watch" ).checked = false;
 document.getElementById( "stepButton" ).disabled = true;
@@ -489,7 +489,7 @@ function disableButtons() {
   document.getElementById( "fileSelect" ).disabled = false;
   document.getElementById( "compileButton" ).disabled = false;
   document.getElementById( "runButton" ).value = "Run";
-  document.getElementById( "submitCode" ).disabled = true;
+//  document.getElementById( "submitCode" ).disabled = true;
   codeCompiledOK = false;
   codeRunning = false;
   document.getElementById( "code" ).focus();
@@ -608,7 +608,7 @@ function compileCode() {
     document.getElementById( "hexdumpButton" ).disabled = false;
     document.getElementById( "compileButton" ).disabled = true;
     document.getElementById( "fileSelect" ).disabled = false;
-    document.getElementById( "submitCode" ).disabled = false;
+//    document.getElementById( "submitCode" ).disabled = false;
     memory[defaultCodePC] = 0x00;
   } else {
     str = lines[x].replace( "<", "&lt;" ).replace( ">", "&gt;" );
@@ -1295,7 +1295,7 @@ function runBinary() {
     document.getElementById( "runButton" ).value = "Run";
     document.getElementById( "hexdumpButton" ).disabled = false;
     document.getElementById( "fileSelect" ).disabled = false;
-    document.getElementById( "submitCode" ).disabled = false;
+//    document.getElementById( "submitCode" ).disabled = false;
 //    document.getElementById( "watch" ).disabled = true;
     toggleDebug();
     stopDebugger();
@@ -1304,7 +1304,7 @@ function runBinary() {
     document.getElementById( "runButton" ).value = "Stop";
     document.getElementById( "fileSelect" ).disabled = true;
     document.getElementById( "hexdumpButton" ).disabled = true;
-    document.getElementById( "submitCode" ).disabled = true;
+//    document.getElementById( "submitCode" ).disabled = true;
     codeRunning = true;
     myInterval = setInterval( "multiexecute()", 1 );
    document.getElementById( "stepButton" ).disabled = !debug;
@@ -1437,7 +1437,7 @@ function execute() {
     document.getElementById( "runButton" ).value = "Run";
     document.getElementById( "fileSelect" ).disabled = false;
     document.getElementById( "hexdumpButton" ).disabled = false;
-    document.getElementById( "submitCode" ).disabled = false;
+//    document.getElementById( "submitCode" ).disabled = false;
   }
 }
 
@@ -2469,4 +2469,5 @@ function updateDisplayFull() {
     }
   }
 }
+
 
