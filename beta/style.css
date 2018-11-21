@@ -1,5 +1,5 @@
 BODY {
-  background-color: #e8e8f0;
+  background-color: #d0c8b8;
 }
 
 FONT.title {
@@ -8,18 +8,8 @@ FONT.title {
   font-weight: bold;
 }
 
-FONT.subtitle {
-  font-family: georgia, sans-serif, verdana, helvetica;
-  font-size: 12px;
-  font-weight: normal;
-  color: #aaaab8;
-}
-
 DIV.screen {
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-  border-bottom: 1px solid black;
-  border-top: 1px solid black;
+  border: 1px solid black;
   background-color: #ffffff;
   width: 192px;
   height: 192px;
@@ -27,18 +17,16 @@ DIV.screen {
 
 TEXTAREA.code {
   margin: 0px 0px 0px 0px;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-  border-bottom: 1px solid black;
-  border-top: 1px solid black;
+  border: 1px solid black;
   width: 400px;
-  height: 194px;
+  height: 300px;
   font-family: courier, fixed, system;
   font-size: 10px;
   overflow: auto;
 }
 
 INPUT,SELECT {
+  margin-top: 3px;
   width: 85px;
   height: 22px;
   font-family: arial, georgia, verdana, sans-serif;
@@ -74,13 +62,10 @@ P.helptext {
 }
 
 DIV.messages {
-  border-left: 1px solid #999999;
-  border-right: 1px solid #999999;
-  border-bottom: 1px solid #999999;
-  border-top: 1px solid #999999;
+  border: 1px solid #999999;
   background-color: #e8e8f0;
   overflow: auto;
-  width: 596px;
+  width: 690px;
   height: 100px;
   text-align: left;
   font-family: georgia, sans-serif, verdana, helvetica;
@@ -88,29 +73,33 @@ DIV.messages {
   color: #444444;
 }
 
-DIV.cursor {
-  margin-top: 5px;
-  margin-left: 0px;
-  margin-bottom: 2px;
-  font-family: georgia, sans-serif, verdana, helvetica;
-  font-size: 10px;
-  color: #444444;
-}
-
-INPUT.paypal {
-  width: 110px;
-  height: 23px;
-}
-
-FONT.paypal {
-  font-family: georgia, sans-serif, verdana, helvetica;
-  font-size: 10px;
-  color: #444444;
-}
-
 FONT.version {
   font-family: georgia, sans-serif, verdana, helvetica;
   font-size: 10px;
-  color: #ff6666;
+  color: #686844;
   font-weight: bold;
 }
+
+FONT.reloaded {
+  font-family: georgia, sans-serif, verdana, helvetica;
+  font-size: 13px;
+  position: relative;
+  top: -6px;
+  left: 45px;
+  color: #c85800;
+  font-weight: bold;
+}
+
+DIV.minidebugger {
+  font-family: fixed, system, courier;
+  font-size: 12px;
+}
+
+DIV.dbugWin {
+  border: 1px black solid;
+  margin-top: 5px;
+  padding: 3px;
+  height: 93px;
+  text-align: center;
+}
+

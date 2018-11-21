@@ -1,6 +1,6 @@
 /*
  *  6502 assembler and emulator in Javascript
- *  (C)2006-2009 Stian Soreng - www.6502asm.com
+ *  (C)2006-2010 Stian Soreng - www.6502asm.com
  *
  *  Released under the GNU General Public License
  *  see http://gnu.org/licenses/gpl.html
@@ -24,11 +24,271 @@ var xmlhttp;
 var myInterval;
 var display = new Array( 0x400 );
 var defaultCodePC = 0x600;
+var debug = false;
 var palette = new Array(
   "#000000", "#ffffff", "#880000", "#aaffee",
   "#cc44cc", "#00cc55", "#0000aa", "#eeee77",
   "#dd8855", "#664400", "#ff7777", "#333333",
   "#777777", "#aaff66", "#0088ff", "#bbbbbb" );
+
+var inst= new Array(
+i00,	//00
+i01,	//01
+ierr,	//02
+ierr,	//03
+ierr,	//04
+i05,	//05
+i06,	//06
+ierr,	//07
+i08,	//08
+i09,	//09
+i0a,	//0a
+ierr,	//0b
+ierr,	//0c
+i0d,	//0d
+i0e,	//0e
+ierr,	//0f
+i10,	//10
+i11,	//11
+ierr,	//12
+ierr,	//13
+ierr,	//14
+i15,	//15
+i16,	//16
+ierr,	//17
+i18,	//18
+i19,	//19
+ierr,	//1a
+ierr,	//1b
+ierr,	//1c
+i1d,	//1d
+i1e,	//1e
+ierr,	//1f
+i20,	//20
+i21,	//21
+ierr,	//22
+ierr,	//23
+i24,	//24
+i25,	//25
+i26,	//26
+ierr,	//27
+i28,	//28
+i29,	//29
+i2a,	//2a
+ierr,	//2b
+i2c,	//2c
+i2d,	//2d
+i2e,	//2e
+ierr,	//2f
+i30,	//30
+i31,	//31
+ierr,	//32
+ierr,	//33
+ierr,	//34
+i35,	//35
+i36,	//36
+ierr,	//37
+i38,	//38
+i39,	//39
+ierr,	//3a
+ierr,	//3b
+ierr,	//3c
+i3d,	//3d
+i3e,	//3e
+ierr,	//3f
+i40,	//40
+i41,	//41
+ierr,	//42
+ierr,	//43
+ierr,	//44
+i45,	//45
+i46,	//46
+ierr,	//47
+i48,	//48
+i49,	//49
+i4a,	//4a
+ierr,	//4b
+i4c,	//4c
+i4d,	//4d
+i4e,	//4e
+ierr,	//4f
+i50,	//50
+i51,	//51
+ierr,	//52
+ierr,	//53
+ierr,	//54
+i55,	//55
+i56,	//56
+ierr,	//57
+i58,	//58
+i59,	//59
+ierr,	//5a
+ierr,	//5b
+ierr,	//5c
+i5d,	//5d
+i5e,	//5e
+ierr,	//5f
+i60,	//60
+i61,	//61
+ierr,	//62
+ierr,	//63
+ierr,	//64
+i65,	//65
+i66,	//66
+ierr,	//67
+i68,	//68
+i69,	//69
+i6a,	//6a
+ierr,	//6b
+i6c,	//6c
+i6d,	//6d
+i6e,	//6e
+ierr,	//6f
+i70,	//70
+i71,	//71
+ierr,	//72
+ierr,	//73
+ierr,	//74
+i75,	//75
+i76,	//76
+ierr,	//77
+i78,	//78
+i79,	//79
+ierr,	//7a
+ierr,	//7b
+ierr,	//7c
+i7d,	//7d
+i7e,	//7e
+ierr,	//7f
+ierr,	//80
+i81,	//81
+ierr,	//82
+ierr,	//83
+i84,	//84
+i85,	//85
+i86,	//86
+ierr,	//87
+i88,	//88
+ierr,	//89
+i8a,	//8a
+ierr,	//8b
+i8c,	//8c
+i8d,	//8d
+i8e,	//8e
+ierr,	//8f
+i90,	//90
+i91,	//91
+ierr,	//92
+ierr,	//93
+i94,	//94
+i95,	//95
+i96,	//96
+ierr,	//97
+i98,	//98
+i99,	//99
+i9a,	//9a
+ierr,	//9b
+ierr,	//9c
+i9d,	//9d
+ierr,	//9e
+ierr,	//9f
+ia0,	//a0
+ia1,	//a1
+ia2,	//a2
+ierr,	//a3
+ia4,	//a4
+ia5,	//a5
+ia6,	//a6
+ierr,	//a7
+ia8,	//a8
+ia9,	//a9
+iaa,	//aa
+ierr,	//ab
+iac,	//ac
+iad,	//ad
+iae,	//ae
+ierr,	//af
+ib0,	//b0
+ib1,	//b1
+ierr,	//b2
+ierr,	//b3
+ib4,	//b4
+ib5,	//b5
+ib6,	//b6
+ierr,	//b7
+ib8,	//b8
+ib9,	//b9
+iba,	//ba
+ierr,	//bb
+ibc,	//bc
+ibd,	//bd
+ibe,	//be
+ierr,	//bf
+ic0,	//c0
+ic1,	//c1
+ierr,	//c2
+ierr,	//c3
+ic4,	//c4
+ic5,	//c5
+ic6,	//c6
+ierr,	//c7
+ic8,	//c8
+ic9,	//c9
+ica,	//ca
+ierr,	//cb
+icc,	//cc
+icd,	//cd
+ierr,	//ce
+ierr,	//cf
+id0,	//d0
+id1,	//d1
+ierr,	//d2
+ierr,	//d3
+ierr,	//d4
+id5,	//d5
+id6,	//d6
+ierr,	//d7
+id8,	//d8
+id9,	//d9
+ierr,	//da
+ierr,	//db
+ierr,	//dc
+idd,	//dd
+ide,	//de
+ierr,	//df
+ie0,	//e0
+ie1,	//e1
+ierr,	//e2
+ierr,	//e3
+ie4,	//e4
+ie5,	//e5
+ie6,	//e6
+ierr,	//e7
+ie8,	//e8
+ie9,	//e9
+iea,	//ea
+ierr,	//eb
+iec,	//ec
+ied,	//ed
+iee,	//ee
+ierr,	//ef
+if0,	//f0
+if1,	//f1
+ierr,	//f2
+ierr,	//f3
+ierr,	//f4
+if5,	//f5
+if6,	//f6
+ierr,	//f7
+if8,	//f8
+if9,	//f9
+ierr,	//fa
+ierr,	//fb
+ierr,	//fc
+ifd,	//fd
+ife,	//fe
+ierr	//ff
+);
 
 var Opcodes = new Array(
 
@@ -96,10 +356,13 @@ Array("---", 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 )
 
 document.getElementById( "compileButton" ).disabled = false;
 document.getElementById( "runButton" ).disabled = true;
-//document.getElementById( "hexdumpButton" ).disabled = true;
+document.getElementById( "hexdumpButton" ).disabled = true;
 document.getElementById( "fileSelect" ).disabled = false;
 //document.getElementById( "submitCode" ).disabled = true;
-
+//document.getElementById( "watch" ).disabled = true;
+document.getElementById( "watch" ).checked = false;
+document.getElementById( "stepButton" ).disabled = true;
+document.getElementById( "gotoButton" ).disabled = true;
 document.addEventListener( "keypress", keyPress, true );
 
 // Paint the "display"
@@ -125,12 +388,92 @@ reset();
  */
 
 function keyPress( e ) {
-  if( typeof window.event != "undefined" )
-    e = window.event; // IE fix
-  if( e.type == "keypress" ) {
-    value = e.which;
-    memStoreByte( 0xff, value );
-  }
+	if( typeof window.event != "undefined" )
+		e = window.event;
+	if( e.type == "keypress" ) {
+		value = e.which;
+		memStoreByte( 0xff, value );
+	}
+}
+
+/*
+ *  debugExec() - Execute one instruction and print values
+ */
+
+function debugExec() {
+	if( codeRunning )
+		execute();
+	updateDebugInfo();
+}
+
+function updateDebugInfo() {
+	var html = "<br />";
+	html += "A=$" + num2hex(regA)+" X=$" + num2hex(regX)+" Y=$" + num2hex(regY)+"<br />";
+	html += "P=$" + num2hex(regP)+" SP=$"+addr2hex(regSP)+" PC=$" + addr2hex(regPC);
+	document.getElementById("md").innerHTML = html;
+}
+
+/*
+ *  gotoAddr() - Set PC to address (or address of label)
+ *
+ */
+
+function gotoAddr() {
+	var inp = prompt( "Enter address or label", "" );
+	var addr = 0;
+	if( findLabel( inp ) ) {
+		addr = getLabelPC( inp );
+	} else {
+		if( inp.match( new RegExp( /^0x[0-9a-f]{1,4}$/i ) ) ) {
+			inp = inp.replace( /^0x/, "" );
+			addr = parseInt( inp, 16 );
+		} else if( inp.match( new RegExp( /^\$[0-9a-f]{1,4}$/i))) {
+			inp = inp.replace( /^\$/, "" );
+			addr = parseInt( inp, 16 );
+		}
+	}
+	if( addr == 0 ) {
+		alert( "Unable to find/parse given address/label" );
+	} else {
+		regPC = addr;
+	}
+	updateDebugInfo();
+}
+
+
+/*
+ *  stopDebugger() - stops debugger
+ *
+ */
+
+function stopDebugger() {
+	debug = false;
+	if( codeRunning ) {
+		document.getElementById( "stepButton" ).disabled = true;
+		document.getElementById( "gotoButton" ).disabled = true;
+	}
+}
+
+function enableDebugger() {
+	debug = true;
+	if( codeRunning ) {
+		updateDebugInfo();
+		document.getElementById( "stepButton" ).disabled = false;
+		document.getElementById( "gotoButton" ).disabled = false;
+	}
+}
+/*
+ *  toggleDebug() - Toggles debugging on/off
+ *
+ */
+
+function toggleDebug() {
+//	alert( "debug="+debug+" og codeRunning="+codeRunning );
+	debug = !debug;
+	if( debug )
+		enableDebugger();
+	else
+		stopDebugger();
 }
 
 
@@ -142,7 +485,7 @@ function keyPress( e ) {
 
 function disableButtons() {
   document.getElementById( "runButton" ).disabled = true;
-//  document.getElementById( "hexdumpButton" ).disabled = true;
+  document.getElementById( "hexdumpButton" ).disabled = true;
   document.getElementById( "fileSelect" ).disabled = false;
   document.getElementById( "compileButton" ).disabled = false;
   document.getElementById( "runButton" ).value = "Run";
@@ -150,6 +493,9 @@ function disableButtons() {
   codeCompiledOK = false;
   codeRunning = false;
   document.getElementById( "code" ).focus();
+  document.getElementById( "stepButton" ).disabled = true;
+  document.getElementById( "gotoButton" ).disabled = true;
+  clearInterval( myInterval );
 }
 
 /*
@@ -164,8 +510,9 @@ function Load( file ) {
   document.getElementById( "compileButton" ).disabled = true;
   xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = FileLoaded;
-  xmlhttp.open( "GET", "examples/" + file );
+  xmlhttp.open( "GET", "/examples/" + file );
   xmlhttp.send( null );
+  stopDebugger();
 }
 
 function FileLoaded() {
@@ -258,7 +605,7 @@ function compileCode() {
 
   if( codeCompiledOK ) {
     document.getElementById( "runButton" ).disabled = false;
-//    document.getElementById( "hexdumpButton" ).disabled = false;
+    document.getElementById( "hexdumpButton" ).disabled = false;
     document.getElementById( "compileButton" ).disabled = true;
     document.getElementById( "fileSelect" ).disabled = false;
 //    document.getElementById( "submitCode" ).disabled = false;
@@ -754,6 +1101,12 @@ function checkAbsolute( param, opcode ) {
     pushWord( value );
     return true;
   }
+  if( param.match( /^[0-9]{1,5}$/i ) ) {  // Thanks, Matt!
+    value = parseInt( param, 10 );
+    if( value < 0 || value > 65535 ) return false;
+    pushWord( value );
+    return( true );
+  }
   // it could be a label too..
   if( param.match( /^\w+$/ ) ) {
     if( findLabel( param ) ) {
@@ -858,16 +1211,6 @@ function memStoreByte( addr, value ) {
 }
 
 /*
- * memStoreByte() - Peek a byte, don't touch any registers
- *
- */
-
-function memReadByte( addr ) {
-  if( addr == 0xfe ) return Math.floor( Math.random()*256 );
-  return memory[addr];
-}
-
-/*
  *  submitCode() - Submits code (using XMLHttpRequest) to be published (moderated)
  *
  */
@@ -916,8 +1259,7 @@ function num2hex( nr ) {
   return str.substring( hi, hi+1  ) + str.substring( lo, lo+1 );
 }
 
-/*
-function hexDump() {
+function hexdump() {
   w = window.open('', 'hexdump', 'width=500,height=300,resizable=yes,scrollbars=yes,toolbar=no,location=no,menubar=no,status=no' );
 
   html = "<html><head>";
@@ -940,7 +1282,6 @@ function hexDump() {
   w.document.write( html );
   w.document.close();
 }
-*/
 
 /*
  *  runBinary() - Executes the compiled code
@@ -949,21 +1290,25 @@ function hexDump() {
 
 function runBinary() {
   if( codeRunning ) {
+    /* Switch OFF everything */
     codeRunning = false;
     document.getElementById( "runButton" ).value = "Run";
-//    document.getElementById( "hexdumpButton" ).disabled = false;
+    document.getElementById( "hexdumpButton" ).disabled = false;
     document.getElementById( "fileSelect" ).disabled = false;
 //    document.getElementById( "submitCode" ).disabled = false;
+//    document.getElementById( "watch" ).disabled = true;
+    toggleDebug();
+    stopDebugger();
     clearInterval( myInterval );
   } else {
-    //reset();
     document.getElementById( "runButton" ).value = "Stop";
     document.getElementById( "fileSelect" ).disabled = true;
-//    document.getElementById( "hexdumpButton" ).disabled = true;
+    document.getElementById( "hexdumpButton" ).disabled = true;
 //    document.getElementById( "submitCode" ).disabled = true;
     codeRunning = true;
     myInterval = setInterval( "multiexecute()", 1 );
-    //execute();
+   document.getElementById( "stepButton" ).disabled = !debug;
+   document.getElementById( "gotoButton" ).disabled = !debug;
   }
 }
 
@@ -980,10 +1325,9 @@ function jumpBranch( offset ) {
 }
 
 function doCompare( reg, val ) {
-  if( (reg+val) > 0xff ) regP |= 1; else regP &= 0xfe;
+//  if( (reg+val) > 0xff ) regP |= 1; else regP &= 0xfe;
+  if( reg>=val ) regP |= 1; else regP &= 0xfe;	// Thanks, "Guest"
   val = (reg-val);
-//  if( reg+0x100-val > 0xff ) regP |= 1; else regP &= 0xfe;
-//  val = reg+0x100-val;
   if( val ) regP &= 0xfd; else regP |= 0x02;
   if( val & 0x80 ) regP |= 0x80; else regP &= 0x7f;
 }
@@ -1065,7 +1409,11 @@ function testADC( value ) {
 }
 
 function multiexecute() {
-  for( w=0; w<128; w++ ) execute();
+  if( ! debug )
+  for( var w=0; w<64; w++ ) {
+	execute();
+	execute();
+  }
 }
 
 /*
@@ -1077,876 +1425,1026 @@ function multiexecute() {
 function execute() {
   if( ! codeRunning ) return;
 
-  opcode = popByte();
-//  message( "PC=" + addr2hex(regPC-1) + " opcode=" + opcode + " X="+regX + " Y=" + regY + " A=" + regA );
-  switch( opcode ) {
-    case 0x00:                            // BRK implied
+  memory[0xfe]=Math.floor( Math.random()*256 );
+  inst[popByte()]();
+
+  if( (regPC == 0) || (!codeRunning) ) {
+    clearInterval( myInterval );
+    message( "Program end at PC=$" + addr2hex( regPC-1 ) );
+    codeRunning = false;
+    document.getElementById( "stepButton" ).disabled = true;
+    document.getElementById( "gotoButton" ).disabled = true;
+    document.getElementById( "runButton" ).value = "Run";
+    document.getElementById( "fileSelect" ).disabled = false;
+    document.getElementById( "hexdumpButton" ).disabled = false;
+//    document.getElementById( "submitCode" ).disabled = false;
+  }
+}
+
+function i00() {
       codeRunning = false;
-      break;
-    case 0x01:                            // ORA INDX
+}
+
+function i01() {
       addr = popByte() + regX;
-      value = memReadByte( addr ) + (memReadByte( addr+1) << 8);
+      value = memory[addr] + (memory[addr+1] << 8);
       regA |= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x05:                            // ORA ZP
+}
+
+function i05() {
       zp = popByte();
-      regA |= memReadByte( zp );
+      regA |= memory[zp];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x06:                            // ASL ZP
+}
+
+function i06() {
       zp = popByte();
-      value = memReadByte( zp );
+      value = memory[zp];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       memStoreByte( zp, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x08:                            // PHP
+}
+
+function i08() {
       stackPush( regP );
-      break;
-    case 0x09:                            // ORA IMM
+}
+
+function i09() {
       regA |= popByte();
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x0a:                            // ASL IMPL
+}
+
+function i0a() {
       regP = (regP & 0xfe) | ((regA>>7)&1);
       regA = regA<<1;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x0d:                            // ORA ABS
-      regA |= memReadByte( popWord() );
+}
+
+function i0d() {
+      regA |= memory[popWord()];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x0e:                            // ASL ABS
+}
+
+function i0e() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 2;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x10:                            // BPL
+}
+
+function i10() {
       offset = popByte();
       if( (regP & 0x80) == 0 ) jumpBranch( offset );
-      break;
-    case 0x11:                            // ORA INDY
+}
+
+function i11() {
       zp = popByte();
-      value = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
-      regA |= memReadByte(value);
+      value = memory[zp] + (memory[zp+1]<<8) + regY;
+      regA |= memory[value];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x15:                            // ORA ZPX
+}
+
+function i15() {
       addr = (popByte() + regX) & 0xff;
-      regA |= memReadByte(addr);
+      regA |= memory[addr];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x16:                            // ASL ZPX
+}
+
+function i16() {
       addr = (popByte() + regX) & 0xff;
-      value = memReadByte(addr);
+      value = memory[addr];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x18:                            // CLC
+}
+
+function i18() {
       regP &= 0xfe;
-      break;
-    case 0x19:                            // ORA ABSY
+}
+
+function i19() {
       addr = popWord() + regY;
-      regA |= memReadByte( addr );
+      regA |= memory[addr];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x1d:                            // ORA ABSX
+}
+
+function i1d() {
       addr = popWord() + regX;
-      regA |= memReadByte( addr );
+      regA |= memory[addr];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x1e:                            // ASL ABSX
+}
+
+function i1e() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x20:                            // JSR ABS
+}
+
+function i20() {
       addr = popWord();
       currAddr = regPC-1;
       stackPush( ((currAddr >> 8) & 0xff) );
       stackPush( (currAddr & 0xff) );
       regPC = addr;
-      break;
-    case 0x21:                            // AND INDX
+}
+
+function i21() {
       addr = (popByte() + regX)&0xff;
-      value = memReadByte( addr ) + (memReadByte( addr+1) << 8);
+      value = memory[addr]+(memory[addr+1] << 8);
       regA &= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x24:                            // BIT ZP
+}
+
+function i24() {
       zp = popByte();
-      value = memReadByte( zp );
+      value = memory[zp];
       if( value & regA ) regP &= 0xfd; else regP |= 0x02;
       regP = (regP & 0x3f) | (value & 0xc0);
-      break;
-    case 0x25:                            // AND ZP
+}
+
+function i25() {
       zp = popByte();
-      regA &= memReadByte( zp );
+      regA &= memory[zp];
       if( regA ) regP &= 0xfd; else regP |= 2;
       if( regA & 0x80 ) regP &= 0x80; else regP &= 0x7f;
-      break;
-    case 0x26:                            // ROL ZP
+}
+
+function i26() {
       sf = (regP & 1);
       addr = popByte();
-      value = memReadByte( addr ); //  & regA;  -- Thanks DMSC ;)
+      value = memory[addr]; //  & regA;  -- Thanks DMSC ;)
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       value |= sf;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x28:                            // PLP
+}
+
+function i28() {
       regP = stackPop() | 0x20;
-      break;
-    case 0x29:                            // AND IMM
+}
+
+function i29() {
       regA &= popByte();
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x2a:                            // ROL A
+}
+
+function i2a() {
       sf = (regP&1);
       regP = (regP&0xfe) | ((regA>>7)&1);
       regA = regA << 1;
       regA |= sf;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x2c:                            // BIT ABS
-      value = memReadByte( popWord() );
+}
+
+function i2c() {
+      value = memory[popWord()];
       if( value & regA ) regP &= 0xfd; else regP |= 0x02;
       regP = (regP & 0x3f) | (value & 0xc0);
-      break;
-    case 0x2d:                            // AND ABS
-      value = memReadByte( popWord() );
+}
+
+function i2d() {
+      value = memory[popWord()];
       regA &= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x2e:                            // ROL ABS
+}
+
+function i2e() {
       sf = regP & 1;
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       value |= sf;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x30:                            // BMI
+}
+
+function i30() {
       offset = popByte();
       if( regP & 0x80 ) jumpBranch( offset );
-      break;
-    case 0x31:                            // AND INDY
+}
+
+function i31() {
       zp = popByte();
-      value = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
-      regA &= memReadByte(value);
+      value = memory[zp]+(memory[zp+1]<<8) + regY;
+      regA &= memory[value];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x35:                            // AND INDX
+}
+
+function i35() {
       zp = popByte();
-      value = memReadByte(zp) + (memReadByte(zp+1)<<8) + regX;
-      regA &= memReadByte(value);
+      value = memory[zp]+(memory[zp+1]<<8) + regX;
+      regA &= memory[value];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x36:                            // ROL ZPX
+}
+
+function i36() {
       sf = regP & 1;
       addr = (popByte() + regX) & 0xff;
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       value |= sf;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x38:                            // SEC
+}
+
+function i38() {
       regP |= 1;
-      break;
-    case 0x39:                            // AND ABSY
+}
+
+function i39() {
       addr = popWord() + regY;
-      value = memReadByte( addr );
+      value = memory[addr];
       regA &= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x3d:                            // AND ABSX
+}
+
+function i3d() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[addr];
       regA &= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x3e:                            // ROL ABSX
+}
+
+function i3e() {
       sf = regP&1;
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP & 0xfe) | ((value>>7)&1);
       value = value << 1;
       value |= sf;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x40:                            // RTI (unsupported, =NOP)
-      break;
-    case 0x41:                            // EOR INDX
+}
+
+function i40() {
+}
+
+function i41() {
       zp = (popByte() + regX)&0xff;
-      value = memReadByte(zp) + (memReadByte(zp+1)<<8);
-      regA ^= memReadByte(value);
+      value = memory[zp]+ (memory[zp+1]<<8);
+      regA ^= memory[value];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x45:                            // EOR ZPX
+}
+
+function i45() {
       addr = (popByte() + regX) & 0xff;
-      value = memReadByte( addr );
+      value = memory[addr];
       regA ^= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x46:                            // LSR ZP
+}
+
+function i46() {
       addr = popByte() & 0xff;
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP & 0xfe) | (value&1);
       value = value >> 1;
       memStoreByte( addr, value );
       if( value != 0 ) regP &= 0xfd; else regP |= 2;
       if( (value&0x80) == 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x48:                            // PHA
+}
+
+function i48() {
       stackPush( regA );
-      break;
-    case 0x49:                            // EOR IMM
+}
+
+function i49() {
       regA ^= popByte();
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x4a:                            // LSR
+}
+
+function i4a() {
       regP = (regP&0xfe) | (regA&1);
       regA = regA >> 1;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x4c:                            // JMP abs
+}
+
+function i4c() {
       regPC = popWord();
-      break;
-    case 0x4d:                            // EOR abs
+}
+
+function i4d() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[addr];
       regA ^= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x4e:                           // LSR abs
+}
+
+function i4e() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[addr];
       regP = (regP&0xfe)|(value&1);
       value = value >> 1;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x50:                           // BVC (on overflow clear)
+}
+
+function i50() {
       offset = popByte();
       if( (regP & 0x40) == 0 ) jumpBranch( offset );
-      break;
-    case 0x51:                           // EOR INDY
+}
+
+function i51() {
       zp = popByte();
-      value = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
-      regA ^= memReadByte(value);
+      value = memory[zp] + (memory[zp+1]<<8) + regY;
+      regA ^= memory[value];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x55:                           // EOR ZPX
+}
+
+function i55() {
       addr = (popByte() + regX) & 0xff;
-      regA ^= memReadByte( addr );
+      regA ^= memory[ addr ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x56:                           // LSR ZPX
+}
+
+function i56() {
       addr = (popByte() + regX) & 0xff;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe) | (value&1);
       value = value >> 1;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x58:                           // CLI (does nothing)
-      break;
-    case 0x59:                           // EOR ABSY
+}
+
+function i58() {
+}
+
+function i59() {
       addr = popWord() + regY;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regA ^= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x5d:                           // EOR ABSX
+}
+
+function i5d() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regA ^= value;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x5e:                           // LSR ABSX
+}
+
+function i5e() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe) | (value&1);
       value = value >> 1;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x60:                           // RTS
+}
+
+function i60() {
       regPC = (stackPop()+1) | (stackPop()<<8);
-      break;
-    case 0x61:                           // ADC INDX
+}
+
+function i61() {
       zp = (popByte() + regX)&0xff;
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8);
-      value = memReadByte( addr );
+      addr = memory[zp] + (memory[zp+1]<<8);
+      value = memory[ addr ];
       testADC( value );
-      break;
-    case 0x65:                           // ADC ZP
+}
+
+function i65() {
       addr = popByte();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       testADC( value );
-      break;
-    case 0x66:                           // ROR ZP
+}
+
+function i66() {
       sf = regP&1;
       addr = popByte();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe)|(value&1);
       value = value >> 1;
       if( sf ) value |= 0x80;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x68:                           // PLA
+}
+
+function i68() {
       regA = stackPop();
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x69:                           // ADC IMM
+}
+
+function i69() {
       value = popByte();
       testADC( value );
-      break;
-    case 0x6a:                           // ROR A
+}
+
+function i6a() {
       sf = regP&1;
       regP = (regP&0xfe) | (regA&1);
       regA = regA >> 1;
       if( sf ) regA |= 0x80;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x6c: // JMP INDIR
-//      regPC = memReadByte(popByte()) + (memReadByte(popByte())<<8);
-      break;
-    case 0x6d:                           // ADC ABS
+}
+
+function i6c() {
+}
+
+function i6d() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       testADC( value );
-      break;
-    case 0x6e:                           // ROR ABS
+}
+
+function i6e() {
       sf = regP&1;
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe)|(value&1);
       value = value >> 1;
       if( sf ) value |= 0x80;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x70:                           // BVS (branch on overflow set)
+}
+
+function i70() {
       offset = popByte();
       if( regP & 0x40 ) jumpBranch( offset );
-      break;
-    case 0x71:                           // ADC INY
+}
+
+function i71() {
       zp = popByte();
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8);
-      value = memReadByte( addr + regY );
+      addr = memory[zp] + (memory[zp+1]<<8);
+      value = memory[ addr + regY ];
       testADC( value );
-      break;
-    case 0x75:                           // ADC ZPX
+}
+
+function i75() {
       addr = (popByte() + regX) & 0xff;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe) | (value&1);
       testADC( value );
-      break;
-    case 0x76:                           // ROR ZPX
+}
+
+function i76() {
       sf = (regP&1);
       addr = (popByte() + regX) & 0xff;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe) | (value&1);
       value = value >> 1;
       if( sf ) value |= 0x80;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x78:                           // SEI (does nothing)
-      break;
-    case 0x79:                           // ADC ABSY
+}
+
+function i78() {
+}
+
+function i79() {
       addr = popWord();
-      value = memReadByte( addr + regY );
+      value = memory[ addr + regY ];
       testADC( value );
-      break;
-    case 0x7d:                           // ADC ABSX
+}
+
+function i7d() {
       addr = popWord();
-      value = memReadByte( addr + regX );
+      value = memory[ addr + regX ];
       testADC( value );
-      break;
-    case 0x7e:                           // ROR ABSX
+}
+
+function i7e() {
       sf = regP&1;
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe) | (value&1);
       value = value >> 1;
       if( value ) value |= 0x80;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x81:                           // STA INDX
+}
+
+function i81() {
       zp = (popByte()+regX)&0xff;
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8);
+      addr = memory[zp] + (memory[zp+1]<<8);
       memStoreByte( addr, regA );
-      break;
-    case 0x84:                           // STY ZP
+}
+
+function i84() {
       memStoreByte( popByte(), regY );
-      break;
-    case 0x85:                           // STA ZP
+}
+
+function i85() {
       memStoreByte( popByte(), regA );
-      break;
-    case 0x86:                           // STX ZP
+}
+
+function i86() {
       memStoreByte( popByte(), regX );
-      break;
-    case 0x88:                           // DEY (1 byte)
+}
+
+function i88() {
       regY = (regY-1) & 0xff;
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x8a:                           // TXA (1 byte);
+}
+
+function i8a() {
       regA = regX & 0xff;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x8c:                           // STY abs
+}
+
+function i8c() {
       memStoreByte( popWord(), regY );
-      break;
-    case 0x8d:                           // STA ABS (3 bytes)
+}
+
+function i8d() {
       memStoreByte( popWord(), regA );
-      break;
-    case 0x8e:                           // STX abs
+}
+
+function i8e() {
       memStoreByte( popWord(), regX );
-      break;
-    case 0x90:                           // BCC (branch on carry clear)
+}
+
+function i90() {
       offset = popByte();
       if( ( regP & 1 ) == 0 ) jumpBranch( offset );
-      break;
-    case 0x91:                           // STA INDY
+}
+
+function i91() {
       zp = popByte();
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
+      addr = memory[zp] + (memory[zp+1]<<8) + regY;
       memStoreByte( addr, regA );
-      break;
-    case 0x94:                           // STY ZPX
+}
+
+function i94() {
       memStoreByte( popByte() + regX, regY );
-      break;
-    case 0x95:                           // STA ZPX
+}
+
+function i95() {
       memStoreByte( popByte() + regX, regA );
-      break;
-    case 0x96:                           // STX ZPY
+}
+
+function i96() {
       memStoreByte( popByte() + regY, regX );
-      break;
-    case 0x98:                           // TYA
+}
+
+function i98() {
       regA = regY & 0xff;
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0x99:                           // STA ABSY
+}
+
+function i99() {
       memStoreByte( popWord() + regY, regA );
-      break;
-    case 0x9a:                           // TXS
+}
+
+function i9a() {
       regSP = regX & 0xff;
-      break;
-    case 0x9d:                           // STA ABSX
+}
+
+function i9d() {
       addr = popWord();
       memStoreByte( addr + regX, regA );
-      break;
-    case 0xa0:                           // LDY IMM
+}
+
+function ia0() {
       regY = popByte();
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa1:                           // LDA INDX
+}
+
+function ia1() {
       zp = (popByte()+regX)&0xff;
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8);
-      regA = memReadByte( addr );
+      addr = memory[zp] + (memory[zp+1]<<8);
+      regA = memory[ addr ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa2:                           // LDX IMM
+}
+
+function ia2() {
       regX = popByte();
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa4:                           // LDY ZP
-      regY = memReadByte( popByte() );
+}
+
+function ia4() {
+      regY = memory[ popByte() ];
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa5:                           // LDA ZP
-      regA = memReadByte( popByte() );
+}
+
+function ia5() {
+      regA = memory[ popByte() ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa6:                          // LDX ZP
-      regX = memReadByte( popByte() );
+}
+
+function ia6() {
+      regX = memory[ popByte() ];
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa8:                          // TAY
+}
+
+function ia8() {
       regY = regA & 0xff;
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xa9:                          // LDA IMM
+}
+
+function ia9() {
       regA = popByte();
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xaa:                          // TAX
+}
+
+function iaa() {
       regX = regA & 0xff;
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xac:                          // LDY ABS
-      regY = memReadByte( popWord() );
+}
+
+function iac() {
+      regY = memory[ popWord() ];
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xad:                          // LDA ABS
-      regA = memReadByte( popWord() );
+}
+
+function iad() {
+      regA = memory[ popWord() ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xae:                          // LDX ABS
-      regX = memReadByte( popWord() );
+}
+
+function iae() {
+      regX = memory[ popWord() ];
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xb0:                          // BCS
+}
+
+function ib0() {
       offset = popByte();
       if( regP & 1 ) jumpBranch( offset );
-      break;
-    case 0xb1:                          // LDA INDY
+}
+
+function ib1() {
       zp = popByte();
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
-      regA = memReadByte( addr );
+      addr = memory[zp] + (memory[zp+1]<<8) + regY;
+      regA = memory[ addr ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break; 
-    case 0xb4:                          // LDY ZPX
-      regY = memReadByte( popByte() + regX );
+}
+
+function ib4() {
+      regY = memory[ popByte() + regX ];
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xb5:                          // LDA ZPX
-      regA = memReadByte( (popByte() + regX) & 0xff );
+}
+
+function ib5() {
+      regA = memory[ (popByte() + regX) & 0xff ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xb6:                          // LDX ZPY
-      regX = memReadByte( popByte() + regY );
+}
+
+function ib6() {
+      regX = memory[ popByte() + regY ];
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xb8:                          // CLV
+}
+
+function ib8() {
       regP &= 0xbf;
-      break;
-    case 0xb9:                          // LDA ABSY
+}
+
+function ib9() {
       addr = popWord() + regY;
-      regA = memReadByte( addr );
+      regA = memory[ addr ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xba:                          // TSX
+}
+
+function iba() {
       regX = regSP & 0xff;
-      break;
-    case 0xbc:                          // LDY ABSX
+}
+
+function ibc() {
       addr = popWord() + regX;
-      regY = memReadByte( addr );
+      regY = memory[ addr ];
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xbd:                          // LDA ABSX
+}
+
+function ibd() {
       addr = popWord() + regX;
-      regA = memReadByte( addr );
+      regA = memory[ addr ];
       if( regA ) regP &= 0xfd; else regP |= 0x02;
       if( regA & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xbe:                          // LDX ABSY
+}
+
+function ibe() {
       addr = popWord() + regY;
-      regX = memReadByte( addr );
+      regX = memory[ addr ];
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xc0:                          // CPY IMM
+}
+
+function ic0() {
       value = popByte();
       if( (regY+value) > 0xff ) regP |= 1; else regP &= 0xfe;
       ov = value;
       value = (regY-value);
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xc1:                          // CMP INDY
+}
+
+function ic1() {
       zp = popByte();
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
-      value = memReadByte( addr );
+      addr = memory[zp] + (memory[zp+1]<<8) + regY;
+      value = memory[ addr ];
       doCompare( regA, value );
-      break;
-    case 0xc4:                          // CPY ZP
-      value = memReadByte( popByte() );
+}
+
+function ic4() {
+      value = memory[ popByte() ];
       doCompare( regY, value );
-      break;
-    case 0xc5:                          // CMP ZP
-      value = memReadByte( popByte() );
+}
+
+function ic5() {
+      value = memory[ popByte() ];
       doCompare( regA, value );
-      break;
-    case 0xc6:                          // DEC ZP
+}
+
+function ic6() {
       zp = popByte();
-      value = memReadByte( zp );
+      value = memory[ zp ];
       --value;
       memStoreByte( zp, value&0xff );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xc8:                          // INY
+}
+
+function ic8() {
       regY = (regY + 1) & 0xff;
       if( regY ) regP &= 0xfd; else regP |= 0x02;
       if( regY & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xc9:                          // CMP IMM
+}
+
+function ic9() {
       value = popByte();
       doCompare( regA, value );
-      break;
-    case 0xca:                          // DEX
+}
+
+function ica() {
       regX = (regX-1) & 0xff;
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xcc:                          // CPY ABS
-      value = memReadByte( popWord() );
+}
+
+function icc() {
+      value = memory[ popWord() ];
       doCompare( regY, value );
-      break;
-    case 0xcd:                          // CMP ABS
-      value = memReadByte( popWord() );
+}
+
+function icd() {
+      value = memory[ popWord() ];
       doCompare( regA, value );
-      break;
-    case 0xce:                          // DEC ABS
+}
+
+function ice() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       --value;
       value = value&0xff;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xd0:                          // BNE
+}
+
+function id0() {
       offset = popByte();
-//      if( (regP&2)==0 ) { oldPC = regPC; jumpBranch( offset ); message( "Jumping from " + addr2hex(oldPC) + " to " + addr2hex(regPC) ); } else { message( "NOT jumping!" ); }
       if( (regP&2)==0 ) jumpBranch( offset );
-      break;
-    case 0xd1:                          // CMP INDY
+}
+
+function id1() {
       zp = popByte();
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8) + regY;
-      value = memReadByte( addr );
+      addr = memory[zp] + (memory[zp+1]<<8) + regY;
+      value = memory[ addr ];
       doCompare( regA, value );
-      break;
-    case 0xd5:                          // CMP ZPX
-      value = memReadByte( popByte() + regX );
+}
+
+function id5() {
+      value = memory[ popByte() + regX ];
       doCompare( regA, value );
-      break;
-    case 0xd6:                          // DEC ZPX
+}
+
+function id6() {
       addr = popByte() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       --value;
       value = value&0xff;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xd8:                          // CLD (CLear Decimal)
+}
+
+function id8() {
       regP &= 0xf7;
-      break;
-    case 0xd9:                          // CMP ABSY
+}
+
+function id9() {
       addr = popWord() + regY;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       doCompare( regA, value );
-      break;
-    case 0xdd:                          // CMP ABSX
+}
+
+function idd() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       doCompare( regA, value );
-      break;
-    case 0xde:                          // DEC ABSX
+}
+
+function ide() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       --value;
       value = value&0xff;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xe0:                          // CPX IMM
+}
+
+function ie0() {
       value = popByte();
       doCompare( regX, value );
-      break;
-    case 0xe1:                          // SBC INDX
+}
+
+function ie1() {
       zp = (popByte()+regX)&0xff;
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8);
-      value = memReadByte( addr );
+      addr = memory[zp] + (memory[zp+1]<<8);
+      value = memory[ addr ];
       testSBC( value );
-      break;
-    case 0xe4:                          // CPX ZP
-      value = memReadByte( popByte() );
+}
+
+function ie4() {
+      value = memory[ popByte() ];
       doCompare( regX, value );
-      break;
-    case 0xe5:                          // SBC ZP
+}
+
+function ie5() {
       addr = popByte();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       testSBC( value );
-      break;
-    case 0xe6:                          // INC ZP
+}
+
+function ie6() {
       zp = popByte();
-      value = memReadByte( zp );
+      value = memory[ zp ];
       ++value;
       value = (value)&0xff;
       memStoreByte( zp, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xe8:                          // INX
+}
+
+function ie8() {
       regX = (regX + 1) & 0xff;
       if( regX ) regP &= 0xfd; else regP |= 0x02;
       if( regX & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xe9:                         // SBC IMM
+}
+
+function ie9() {
       value = popByte();
       testSBC( value );
-      break;
-    case 0xea:                         // NOP
-      break;
-    case 0xec:                         // CPX ABS
-      value = memReadByte( popWord() );
+}
+
+function iea() {
+}
+
+function iec() {
+      value = memory[ popWord() ];
       doCompare( regX, value );
-      break;
-    case 0xed:                         // SBC ABS
+}
+
+function ied() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       testSBC( value );
-      break;
-    case 0xee:                         // INC ABS
+}
+
+function iee() {
       addr = popWord();
-      value = memReadByte( addr );
+      value = memory[ addr ];
       ++value;
       value = (value)&0xff;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xf0:                         // BEQ
+}
+
+function if0() {
       offset = popByte();
       if( regP&2 ) jumpBranch( offset );
-      break;
-    case 0xf1:                         // SBC INDY
+}
+
+function if1() {
       zp = popByte();
-      addr = memReadByte(zp) + (memReadByte(zp+1)<<8);
-      value = memReadByte( addr + regY );
+      addr = memory[zp] + (memory[zp+1]<<8);
+      value = memory[ addr + regY ];
       testSBC( value );
-      break;
-    case 0xf5:                         // SBC ZPX
+}
+
+function if5() {
       addr = (popByte() + regX)&0xff;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       regP = (regP&0xfe)|(value&1);
       testSBC( value );
-      break;
-    case 0xf6:                         // INC ZPX
+}
+
+function if6() {
       addr = popByte() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       ++value;
       value=value&0xff;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    case 0xf8:                         // SED
+}
+
+function if8() {
       regP |= 8;
-      break;
-   case 0xf9:                          // SBC ABSY
+}
+
+function if9() {
       addr = popWord();
-      value = memReadByte( addr + regY );
+      value = memory[ addr + regY ];
       testSBC( value );
-      break;
-    case 0xfd:                         // SBC ABSX
+}
+
+function ifd() {
       addr = popWord();
-      value = memReadByte( addr + regX );
+      value = memory[ addr + regX ];
       testSBC( value );
-      break;
-    case 0xfe: // INC ABSX
+}
+
+function ife() {
       addr = popWord() + regX;
-      value = memReadByte( addr );
+      value = memory[ addr ];
       ++value;
       value=value&0xff;
       memStoreByte( addr, value );
       if( value ) regP &= 0xfd; else regP |= 0x02;
       if( value & 0x80 ) regP |= 0x80; else regP &= 0x7f;
-      break;
-    default:
+}
+
+function ierr() {
       message( "Address $" + addr2hex(regPC) + " - unknown opcode " + opcode );
       codeRunning = false;
-      break;
-  }
-
-  if( (regPC == 0) || (!codeRunning) ) {
-    clearInterval( myInterval );
-    message( "Program end at PC=$" + addr2hex( regPC-1 ) );
-    codeRunning = false;
-    document.getElementById( "runButton" ).value = "Run";
-    document.getElementById( "fileSelect" ).disabled = false;
-//    document.getElementById( "hexdumpButton" ).disabled = false;
-//    document.getElementById( "submitCode" ).disabled = false;
-//    updateDisplayFull();
-  }
 }
+
 
 /*
  *  updatePixelDisplay() - Updates the display at one pixel position
